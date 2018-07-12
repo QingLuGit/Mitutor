@@ -1,0 +1,8 @@
+D:\hackson\Mitutor\DBHandler\bin\x64\Debug\DBHandler.exe.config
+D:\hackson\Mitutor\DBHandler\bin\x64\Debug\DBHandler.exe
+D:\hackson\Mitutor\DBHandler\bin\x64\Debug\DBHandler.pdb
+D:\hackson\Mitutor\DBHandler\bin\x64\Debug\Newtonsoft.Json.dll
+D:\hackson\Mitutor\DBHandler\bin\x64\Debug\Newtonsoft.Json.xml
+D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.csprojResolveAssemblyReference.cache
+D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.exe
+D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.pdb
