@@ -1,9 +1,0 @@
-D:\repository\Mitutor\AlgorithmHelper\bin\Debug\DNN_HMM.dll
-D:\repository\Mitutor\AlgorithmHelper\bin\Debug\F0Extraction.dll
-D:\repository\Mitutor\AlgorithmHelper\bin\Debug\FeatureExtraction.dll
-D:\repository\Mitutor\AlgorithmHelper\bin\Debug\Microsoft.WindowsAzure.IntelligentServices.Pronunciation.AlgorithmHelper.dll
-D:\repository\Mitutor\AlgorithmHelper\bin\Debug\Microsoft.WindowsAzure.IntelligentServices.Pronunciation.AlgorithmHelper.pdb
-D:\repository\Mitutor\AlgorithmHelper\obj\Debug\IntelligentServices.Pronunciation.AlgorithmHelper.csprojAssemblyReference.cache
-D:\repository\Mitutor\AlgorithmHelper\obj\Debug\IntelligentServices.Pronunciation.AlgorithmHelper.csproj.CoreCompileInputs.cache
-D:\repository\Mitutor\AlgorithmHelper\obj\Debug\Microsoft.WindowsAzure.IntelligentServices.Pronunciation.AlgorithmHelper.dll
-D:\repository\Mitutor\AlgorithmHelper\obj\Debug\Microsoft.WindowsAzure.IntelligentServices.Pronunciation.AlgorithmHelper.pdb
