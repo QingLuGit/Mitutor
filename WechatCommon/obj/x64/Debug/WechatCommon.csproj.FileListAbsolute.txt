@@ -3,3 +3,9 @@ D:\hackson\Mitutor\WechatCommon\bin\x64\Debug\WechatCommon.pdb
 D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.csprojResolveAssemblyReference.cache
 D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.dll
 D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.pdb
+D:\repository\Mitutor\WechatCommon\bin\x64\Debug\WechatCommon.dll
+D:\repository\Mitutor\WechatCommon\bin\x64\Debug\WechatCommon.pdb
+D:\repository\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.csprojAssemblyReference.cache
+D:\repository\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.csproj.CoreCompileInputs.cache
+D:\repository\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.dll
+D:\repository\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.pdb

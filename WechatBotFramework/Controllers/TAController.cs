@@ -56,7 +56,7 @@ namespace WechatBotFramework.Controllers
             NotifyResponse resp = new NotifyResponse();
             resp.msg = "Notification is sotred successfully.";
             resp.success = true;
-            
+
             return resp;
         }
     }

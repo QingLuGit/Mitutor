@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WechatBotFramework.Controllers;
 using WechatBotFramework.Data;
+using System.Net;
+using System.IO;
 
 namespace WechatBotFramework.Component
 {
@@ -17,20 +19,21 @@ namespace WechatBotFramework.Component
         public ReplyInfo HandleMessageAll(MessageInfo message)
         {
             ReplyInfo info = new ReplyInfo();
-                                    
-            switch(message.msg_type_id)
+
+            switch (message.msg_type_id)
             {
-                case 4: // msg from contact
+                case 1:
+                case 4:// msg from contact
                     //info.toUserId = message.user.senderId;
                     if (message.content.type == 0)
-                    {                        
+                    {
                         string msg_content = message.content.data;
                         string user_id = message.user.senderId;
                         string user_name = message.user.senderName;
 
                         log.Info("[Contact Message]: From (" + user_name + "), Context: " + msg_content);
 
-                        if((user_name == "YJL SOEVPM") && (msg_content.StartsWith("##")))
+                        if ((user_name == "YJL SOEVPM") && (msg_content.StartsWith("##")))
                         {
                             string[] tmps = msg_content.Split('@');
                             string notifier = user_name;
@@ -54,16 +57,26 @@ namespace WechatBotFramework.Component
                         else
                         {
                             if (!string.IsNullOrWhiteSpace(msg_content))
-                            { 
+                            {
                                 info.reply = controller.AnswerOneOneQuestion(user_id, msg_content);
                             }
                         }
+                    }
+                    else if (message.content.type == 4)
+                    {
+                        string msg_content = message.content.data;
+                        string user_id = message.user.senderId;
+                        string user_name = message.user.senderName;
+
+                        info.reply = controller.AnswerOneOneQuestion(user_id, msg_content);
+                        
+                        log.Info("[Contact Message]: From (" + user_name + "), Context: [Voice Message]");
                     }
                     else
                     {
                         log.Warn("[Warning]: Received non-text messsage from contact: " + message.user.senderName);
                         info.reply = "对不起，我现在只认识文字。";
-                    }                    
+                    }
                     break;
                 case 3: //Group text message
                     //info.toUserId = message.user.groupId;
@@ -72,13 +85,13 @@ namespace WechatBotFramework.Component
                         if (message.user.isAtMe)
                         {
                             if (message.content.type == 0)
-                            {                                
+                            {
                                 string msg_content = message.content.desc;
                                 string src_user_id = message.user.senderId;
-                                string src_user_name = message.user.senderName;                                
+                                string src_user_name = message.user.senderName;
                                 string gid = message.user.groupId;
 
-                                log.Info("[Group AtMe Message]: In Group(" + gid +"), From (" + src_user_name + "), Context: " + msg_content);
+                                log.Info("[Group AtMe Message]: In Group(" + gid + "), From (" + src_user_name + "), Context: " + msg_content);
 
                                 if (!string.IsNullOrWhiteSpace(msg_content))
                                 {
@@ -92,34 +105,34 @@ namespace WechatBotFramework.Component
                                 log.Warn("[Warning]: Received non-text messsage in group: " + message.user.groupId);
                                 info.reply = "对不起，我现在只认识文字。";
                             }
-                        }                        
-                    }
-                    break;
-               /* case 100:
-                    if (message.content.type == 0)
-                    {
-                        string msg_content = message.content.data;
-                        string user_id = message.user.senderId;
-                        string user_name = message.user.senderName;
-
-                        log.Info("[Unknown Contact Message]: From (" + user_name + "), Context: " + msg_content);
-
-                        if (!string.IsNullOrWhiteSpace(msg_content))
-                        {
-                            info.reply = controller.AnswerOneOneQuestion(user_id, msg_content);
-
                         }
                     }
-                    else
-                    {
-                        log.Warn("[Warning]: Received non-text messsage from contact: " + message.user.senderName);
-                        info.reply = "对不起，我现在只认识文字。";
-                    }
-                    break;*/
+                    break;
+                /* case 100:
+                     if (message.content.type == 0)
+                     {
+                         string msg_content = message.content.data;
+                         string user_id = message.user.senderId;
+                         string user_name = message.user.senderName;
+
+                         log.Info("[Unknown Contact Message]: From (" + user_name + "), Context: " + msg_content);
+
+                         if (!string.IsNullOrWhiteSpace(msg_content))
+                         {
+                             info.reply = controller.AnswerOneOneQuestion(user_id, msg_content);
+
+                         }
+                     }
+                     else
+                     {
+                         log.Warn("[Warning]: Received non-text messsage from contact: " + message.user.senderName);
+                         info.reply = "对不起，我现在只认识文字。";
+                     }
+                     break;*/
                 default:
                     break;
             }
-            
+
             return info;
         }
     }

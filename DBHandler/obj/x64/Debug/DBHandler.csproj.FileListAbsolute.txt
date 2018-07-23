@@ -6,3 +6,13 @@ D:\hackson\Mitutor\DBHandler\bin\x64\Debug\Newtonsoft.Json.xml
 D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.csprojResolveAssemblyReference.cache
 D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.exe
 D:\hackson\Mitutor\DBHandler\obj\x64\Debug\DBHandler.pdb
+D:\repository\Mitutor\DBHandler\bin\x64\Debug\DBHandler.exe.config
+D:\repository\Mitutor\DBHandler\bin\x64\Debug\DBHandler.exe
+D:\repository\Mitutor\DBHandler\bin\x64\Debug\DBHandler.pdb
+D:\repository\Mitutor\DBHandler\bin\x64\Debug\Newtonsoft.Json.dll
+D:\repository\Mitutor\DBHandler\bin\x64\Debug\Newtonsoft.Json.xml
+D:\repository\Mitutor\DBHandler\obj\x64\Debug\DBHandler.csprojAssemblyReference.cache
+D:\repository\Mitutor\DBHandler\obj\x64\Debug\DBHandler.csproj.CoreCompileInputs.cache
+D:\repository\Mitutor\DBHandler\obj\x64\Debug\DBHandler.csproj.CopyComplete
+D:\repository\Mitutor\DBHandler\obj\x64\Debug\DBHandler.exe
+D:\repository\Mitutor\DBHandler\obj\x64\Debug\DBHandler.pdb
