@@ -1,1 +1,7 @@
+.vs/
+bin/
+obj/
+packages/
 *.pdb
+*.sln
+*.xml
