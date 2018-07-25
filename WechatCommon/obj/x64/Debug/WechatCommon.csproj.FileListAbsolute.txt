@@ -1,5 +1,0 @@
-D:\hackson\Mitutor\WechatCommon\bin\x64\Debug\WechatCommon.dll
-D:\hackson\Mitutor\WechatCommon\bin\x64\Debug\WechatCommon.pdb
-D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.csprojResolveAssemblyReference.cache
-D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.dll
-D:\hackson\Mitutor\WechatCommon\obj\x64\Debug\WechatCommon.pdb

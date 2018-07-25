@@ -34,7 +34,7 @@ namespace WechatBotFramework.Component
         private string wxqrFilePath = "wxqr.png";
         private string uuid = null;
 
-        private string deviceId = "e642833123359051"; 
+        private string deviceId = "e642833123359051";
         private string redirectURI = null;
         private string baseURI = null;
         private string baseHost = null;
@@ -101,12 +101,12 @@ namespace WechatBotFramework.Component
             };
 
             WebClient webClient = new WebClient();
-            foreach(string key in Params.Keys)
+            foreach (string key in Params.Keys)
             {
                 webClient.QueryString.Add(key, Params[key]);
             }
-                        
-            string result = webClient.DownloadString(url);                        
+
+            string result = webClient.DownloadString(url);
 
             string rule = "window.QRLogin.code = (\\d+); window.QRLogin.uuid = \"(\\S+?)\"";
             Regex regex = new Regex(rule);
@@ -117,19 +117,19 @@ namespace WechatBotFramework.Component
             {
                 code = match.Groups[1].ToString();
                 if (code == "200")
-                {                
+                {
                     this.uuid = match.Groups[2].ToString();
                     return;
                 }
 
                 match = match.NextMatch();
             }
-            
+
         }
 
         public void GenerateQRCode()
         {
-            string str = "https://login.weixin.qq.com/l/" + this.uuid;           
+            string str = "https://login.weixin.qq.com/l/" + this.uuid;
 
             QrEncoder qrEncoder = new QrEncoder(ErrorCorrectionLevel.H);
             QrCode qrCode = new QrCode();
@@ -155,7 +155,7 @@ namespace WechatBotFramework.Component
         }
 
         private string GetResponseCode(string respStr)
-        {            
+        {
             string result = ParsePatternFromText("window.code=(\\d+);", respStr, 1);
             if (result == null)
             {
@@ -217,7 +217,7 @@ namespace WechatBotFramework.Component
                     this.baseURI = this.baseURI.Replace("/" + tmps[tmps.Length - 1], "");
 
                     this.baseHost = this.baseURI.Replace("https://", "").Split('/')[0];
-                    return code;                    
+                    return code;
                 }
                 else if (code == TIMEOUT)
                 {
@@ -263,7 +263,7 @@ namespace WechatBotFramework.Component
             foreach (XmlNode node in doc.DocumentElement.ChildNodes)
             {
                 string text = node.InnerText; //or loop through its children as well
-                switch(node.Name)
+                switch (node.Name)
                 {
                     case "skey":
                         this.skey = node.ChildNodes[0].Value;
@@ -289,7 +289,7 @@ namespace WechatBotFramework.Component
             this.baseRequest.Uin = uint.Parse(this.uin);
             this.baseRequest.Sid = this.sid;
             this.baseRequest.Skey = this.skey;
-            this.baseRequest.DeviceID = this.deviceId;            
+            this.baseRequest.DeviceID = this.deviceId;
 
             return true;
         }
@@ -301,7 +301,7 @@ namespace WechatBotFramework.Component
 
         public bool Init()
         {
-        
+
             string url = this.baseURI + "/webwxinit?r=" + this.GetTimeStamp() + "&lang=en_US&pass_ticket=" + this.pass_ticket;
             //WebClient webClient = new WebClient();
 
@@ -313,23 +313,23 @@ namespace WechatBotFramework.Component
             string baseRequestStr = JsonConvert.SerializeObject(reqparm);
 
             string result = wechatClient.Post(url, baseRequestStr);//webClient.UploadString(url, baseRequestStr);
-                                  
+
             dynamic json = JsonConvert.DeserializeObject<dynamic>(result);
 
             this.sync_key = JsonConvert.DeserializeObject<SyncKeyInfo>(json.SyncKey.ToString());//JsonConvert.SerializeObject(json.SyncKey); 
-            this.myAccount = JsonConvert.DeserializeObject<ContactInfo>(json.User.ToString()); 
+            this.myAccount = JsonConvert.DeserializeObject<ContactInfo>(json.User.ToString());
 
             List<string> strList = new List<string>();
-            
-            foreach(KeyVal element in this.sync_key.List)
+
+            foreach (KeyVal element in this.sync_key.List)
             {
-                string str = element.Key + "_" + element.Val; 
+                string str = element.Key + "_" + element.Val;
                 strList.Add(str);
             }
 
             this.sync_key_str = string.Join("|", strList);
 
-            int ret = json.BaseResponse.Ret; 
+            int ret = json.BaseResponse.Ret;
             if (ret == 0)
             {
                 return true;
@@ -362,9 +362,9 @@ namespace WechatBotFramework.Component
             reqParam.ClientMsgId = long.Parse(this.GetTimeStamp());
 
 
-           // WebClient webClient = new WebClient();
-           // webClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-            
+            // WebClient webClient = new WebClient();
+            // webClient.Headers[HttpRequestHeader.ContentType] = "application/json";
+
             string paramStr = JsonConvert.SerializeObject(reqParam);
 
             string result = wechatClient.Post(url, paramStr);//webClient.UploadString(url, paramStr);
@@ -379,8 +379,8 @@ namespace WechatBotFramework.Component
             else
             {
                 return false;
-            }           
-        }        
+            }
+        }
 
 
         private int ReadMembers(ref List<ContactInfo> memberList, string result)
@@ -405,12 +405,12 @@ namespace WechatBotFramework.Component
             {
                 return -1;
             }
-            
+
         }
-                
+
         public bool GetContacts()
         {
-            string url = this.baseURI + "/webwxgetcontact?seq=0&pass_ticket=" + this.pass_ticket + "&skey=" + this.skey + "&r=" + this.GetTimeStamp();            
+            string url = this.baseURI + "/webwxgetcontact?seq=0&pass_ticket=" + this.pass_ticket + "&skey=" + this.skey + "&r=" + this.GetTimeStamp();
 
             string paramStr = "{}";
 
@@ -418,18 +418,18 @@ namespace WechatBotFramework.Component
             try
             {
                 string result = wechatClient.Post(url, paramStr, 180);
-                                              
+
                 int seq = this.ReadMembers(ref memberList, result);
-                
+
                 while (seq != 0)
-                {                    
+                {
                     url = this.baseURI + "/webwxgetcontact?seq=" + seq.ToString() + "&pass_ticket=" + this.pass_ticket + "&skey=" + this.skey + "&r=" + this.GetTimeStamp();
                     result = wechatClient.Post(url, paramStr, 180);
 
                     seq = this.ReadMembers(ref memberList, result);
                 }
 
-               // this.memberList.AddRange(memberList);
+                // this.memberList.AddRange(memberList);
 
                 string[] specialUsers = {"newsapp", "fmessage", "filehelper", "weibo", "qqmail",
                          "fmessage", "tmessage", "qmessage", "qqsync", "floatbottle",
@@ -439,13 +439,13 @@ namespace WechatBotFramework.Component
                          "weixinreminder", "wxid_novlwrv3lqwv11", "gh_22b87fa7cb3c",
                          "officialaccounts", "notification_messages", "wxid_novlwrv3lqwv11",
                          "gh_22b87fa7cb3c", "wxitil", "userexperience_alarm", "notification_messages"};
-                
-               
-                foreach(ContactInfo contact in memberList)
+
+
+                foreach (ContactInfo contact in memberList)
                 {
-                    if ((contact.VerifyFlag & 8 ) != 0)
+                    if ((contact.VerifyFlag & 8) != 0)
                     {
-                        
+
                         ContactInfoWithType it = new ContactInfoWithType();
                         it.type = MessageType.Public;//"public";
                         it.info = contact;
@@ -454,8 +454,8 @@ namespace WechatBotFramework.Component
                         userMgmtStore.SetNoramlAccountInfo(contact.UserName, it);
                     }
                     else if (specialUsers.Contains(contact.UserName))
-                    {               
-                        
+                    {
+
                         ContactInfoWithType it = new ContactInfoWithType();
                         it.type = MessageType.Special;// "special";
                         it.info = contact;
@@ -485,7 +485,7 @@ namespace WechatBotFramework.Component
                         userMgmtStore.SetNoramlAccountInfo(contact.UserName, it);
                     }
                     else
-                    {                     
+                    {
                         ContactInfoWithType it = new ContactInfoWithType();
                         it.type = MessageType.Contact;//"contact";
                         it.info = contact;
@@ -494,10 +494,11 @@ namespace WechatBotFramework.Component
                         userMgmtStore.SetNoramlAccountInfo(contact.UserName, it);
                     }
                 }
-                
+
                 return true;
-                
-            } catch(Exception e)
+
+            }
+            catch (Exception e)
             {
                 log.Error(e.Message);
                 return false;
@@ -540,7 +541,7 @@ namespace WechatBotFramework.Component
                         ContactInfo dictMemeber = JsonConvert.DeserializeObject<ContactInfo>(jsonStr);
                         memberList.Add(dictMemeber.UserName, dictMemeber);
 
-                        string memberUserName = member.UserName;                        
+                        string memberUserName = member.UserName;
                     }
 
                     string encryChatRoomId = group.EncryChatRoomId;
@@ -549,7 +550,7 @@ namespace WechatBotFramework.Component
                     userMgmtStore.SetGroupMembers(gid, memberList);
 
                     this.encryChatRoomIdList[gid] = encryChatRoomId;
-                   
+
                 }
 
                 return 0;
@@ -569,12 +570,12 @@ namespace WechatBotFramework.Component
             param.BaseRequest = this.baseRequest;
             param.Count = userMgmtStore.GetGroupNumber();//this.groupList.Count;
             param.List = new GroupData[param.Count];
-            for(int i = 0; i < param.Count; i ++)
+            for (int i = 0; i < param.Count; i++)
             {
                 GroupData info = new GroupData();
                 ContactInfo group = userMgmtStore.GetGroup(i);
                 info.UserName = group.UserName;//this.groupList[i].UserName;
-                info.EncryChatRoomId = string.IsNullOrEmpty(group.EncryChatRoomId)?"": group.EncryChatRoomId;
+                info.EncryChatRoomId = string.IsNullOrEmpty(group.EncryChatRoomId) ? "" : group.EncryChatRoomId;
                 param.List[i] = info;
             }
 
@@ -584,10 +585,10 @@ namespace WechatBotFramework.Component
             int ret = 1;
 
             try
-            { 
+            {
                 ret = this.ReadGroupMembers(result);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.Error(e.Message);
             }
@@ -599,12 +600,12 @@ namespace WechatBotFramework.Component
             else
             {
                 return false;
-            }            
+            }
         }
 
         private bool TestSyncCheck()
         {
-            string[] hosts = {"webpush." , "webpush2." };
+            string[] hosts = { "webpush.", "webpush2." };
 
             string retcode = null;
 
@@ -615,7 +616,7 @@ namespace WechatBotFramework.Component
                 try
                 {
                     info = SyncCheck();
-                    retcode = info.retcode;    
+                    retcode = info.retcode;
                 }
                 catch (Exception e)
                 {
@@ -651,7 +652,7 @@ namespace WechatBotFramework.Component
             Regex regex = new Regex(rule);
 
             Match match = regex.Match(result);
-            
+
             if (match.Success)
             {
                 info.retcode = match.Groups[1].ToString();
@@ -660,7 +661,7 @@ namespace WechatBotFramework.Component
 
             if (info.retcode != "0")
             {
-                log.Warn(result);                
+                log.Warn(result);
             }
 
             //log.Info("retcode: " + info.retcode + "; selector: " + info.selector);
@@ -690,15 +691,15 @@ namespace WechatBotFramework.Component
             string paramStr = JsonConvert.SerializeObject(Params);
 
             try
-            { 
+            {
                 string result = wechatClient.Post(url, paramStr, 60);
 
                 dynamic json = JsonConvert.DeserializeObject<dynamic>(result);
                 int ret = json.BaseResponse.Ret;
                 if (ret == 0)
-                {                    
+                {
                     this.sync_key = JsonConvert.DeserializeObject<SyncKeyInfo>(json.SyncKey.ToString());
-                    
+
                     List<string> strList = new List<string>();
 
                     foreach (KeyVal element in this.sync_key.List)
@@ -711,9 +712,10 @@ namespace WechatBotFramework.Component
 
                     return result;
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-               log.Error(e.Message);
+                log.Error(e.Message);
             }
             return null;
 
@@ -751,7 +753,7 @@ namespace WechatBotFramework.Component
 
         private string[] ProcAtInfo(ref MessageInfo msgInfo, string msg)
         {
-            if(string.IsNullOrWhiteSpace(msg))
+            if (string.IsNullOrWhiteSpace(msg))
             {
                 return null;
             }
@@ -764,12 +766,12 @@ namespace WechatBotFramework.Component
 
             if (segs.Length > 1)
             {
-                for (int i = 0; i < segs.Length; i ++ )
+                for (int i = 0; i < segs.Length; i++)
                 {
                     string seg = segs[i];
 
-                    if (i < segs.Length -1)
-                    { 
+                    if (i < segs.Length - 1)
+                    {
                         seg += "\u2005";
                     }
 
@@ -793,7 +795,7 @@ namespace WechatBotFramework.Component
 
                             infos.Add(tv);
                         }
-                        
+
                         TypeValueData tv2 = new TypeValueData();
                         tv2.type = "at";
                         tv2.value = name;
@@ -804,7 +806,7 @@ namespace WechatBotFramework.Component
                     {
                         str_msg_all += seg;
                         str_msg += seg;
-                                               
+
                         TypeValueData tv3 = new TypeValueData();
                         tv3.type = "str";
                         tv3.value = seg;
@@ -814,7 +816,7 @@ namespace WechatBotFramework.Component
                 }
 
                 str_msg_all += segs[segs.Length - 1];
-                str_msg += segs[segs.Length - 1];                
+                str_msg += segs[segs.Length - 1];
 
                 TypeValueData tv4 = new TypeValueData();
                 tv4.type = "str";
@@ -824,7 +826,7 @@ namespace WechatBotFramework.Component
 
             }
             else
-            {               
+            {
                 TypeValueData tv5 = new TypeValueData();
                 tv5.type = "str";
                 tv5.value = segs[segs.Length - 1];
@@ -839,7 +841,7 @@ namespace WechatBotFramework.Component
             {
                 List<string> atNames = new List<string>();
 
-                foreach(TypeValueData tv in infos)
+                foreach (TypeValueData tv in infos)
                 {
                     if (tv.type == "at")
                     {
@@ -880,7 +882,7 @@ namespace WechatBotFramework.Component
             results[1] = str_msg;
             results[2] = infoStr;
 
-            return results;            
+            return results;
         }
         /*
          * """
@@ -909,7 +911,7 @@ namespace WechatBotFramework.Component
             string content = WebUtility.HtmlDecode(msg.Content.ToString());
             string msg_id = msg.MsgId;
 
-            switch(msg_type_id)
+            switch (msg_type_id)
             {
                 case 0:
                     msg_content.type = 11;
@@ -918,16 +920,16 @@ namespace WechatBotFramework.Component
                 case 2:
                     msg_content.type = 0;
                     msg_content.data = content.Replace("<br/>", "\n");
-                    return msg_content;                    
+                    return msg_content;
                 case 3:
-                    string[] tmps = content.Split(new string[] { "<br/>" }, StringSplitOptions.None);                        
+                    string[] tmps = content.Split(new string[] { "<br/>" }, StringSplitOptions.None);
                     string uid = "";
                     if (tmps.Length > 1)
                     {
                         uid = tmps[0];
                         uid = uid.Substring(0, uid.Length - 1);
                         content = "";
-                        for (int i = 1; i < tmps.Length; i ++)
+                        for (int i = 1; i < tmps.Length; i++)
                         {
                             if (i > 1)
                             {
@@ -953,16 +955,16 @@ namespace WechatBotFramework.Component
                         MsgSourceInfo user = new MsgSourceInfo();
                         user.senderId = uid;
                         user.senderName = name;
-                        user.groupId = gid;                        
+                        user.groupId = gid;
 
-                        msgInfo.user = user;                        
+                        msgInfo.user = user;
                     }
                     break;
                 default:
                     break;
             }
 
-            switch(mtype)
+            switch (mtype)
             {
                 case 1:
                     if (content.Contains("http://weixin.qq.com/cgi-bin/redirectforward?args="))
@@ -990,29 +992,29 @@ namespace WechatBotFramework.Component
                         }
                     }
                     break;
-                case 3:                    
+                case 3:
                     msg_content.type = 3;
                     msg_content.data = this.baseURI + "/webwxgetmsgimg?MsgID=" + msg_id + "&skey=" + this.skey;
                     string res = this.wechatClient.GetString(msg_content.data);
                     byte[] byteArray = UnicodeEncoding.UTF8.GetBytes(res);
                     msg_content.img = byteArray;
                     break;
-                case 34:                    
+                case 34:
                     msg_content.type = 4;
                     msg_content.data = this.baseURI + "/webwxgetvoice?msgid=" + msg_id + "&skey=" + this.skey;
                     string voice = this.wechatClient.GetString(msg_content.data);
                     byte[] vArray = UnicodeEncoding.UTF8.GetBytes(voice);
                     msg_content.voice = vArray;
                     break;
-                case 37:                    
+                case 37:
                     msg_content.type = 37;
                     msg_content.data = msg.RecommendInfo.ToString();
                     break;
-                case 42:                   
+                case 42:
                     msg_content.type = 5;
                     dynamic info = msg.RecommendInfo;
 
-                    Dictionary<string,string> data = new Dictionary<string, string>();
+                    Dictionary<string, string> data = new Dictionary<string, string>();
                     data.Add("nickname", info.NickName.ToString());
                     data.Add("alias", info.Alias.ToString());
                     data.Add("province", info.Province.ToString());
@@ -1021,20 +1023,20 @@ namespace WechatBotFramework.Component
 
                     msg_content.data = JsonConvert.SerializeObject(data);
                     break;
-                case 47:                    
+                case 47:
                     msg_content.type = 6;
                     msg_content.data = this.SearchContent("cdnurl", content, null);
                     break;
-                case 49:                    
+                case 49:
                     msg_content.type = 7;
 
                     int appType = -1;
                     try
-                    { 
+                    {
                         string appTypeStr = msg.AppMsgType.ToString();
                         appType = int.Parse(appTypeStr);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         log.Error(e.Message);
                     }
@@ -1065,7 +1067,7 @@ namespace WechatBotFramework.Component
 
                     msg_content.data = JsonConvert.SerializeObject(dict);
 
-                    break;             
+                    break;
                 case 62:
                     msg_content.type = 8;
                     msg_content.data = content;
@@ -1084,7 +1086,7 @@ namespace WechatBotFramework.Component
                     break;
                 case 43:
                     msg_content.type = 13;
-                    msg_content.data = this.baseURI + "/webwxgetvideo?msgid=" + msg_id + "&skey=" + this.skey; 
+                    msg_content.data = this.baseURI + "/webwxgetvideo?msgid=" + msg_id + "&skey=" + this.skey;
                     break;
                 default:
                     msg_content.type = 99;
@@ -1092,12 +1094,12 @@ namespace WechatBotFramework.Component
                     break;
 
             }
-                        
+
             return msg_content;
         }
 
         public void HandleMessage(string result)
-        {           
+        {
             dynamic json = JsonConvert.DeserializeObject<dynamic>(result);
             foreach (var msg in json.AddMsgList)
             {
@@ -1133,7 +1135,7 @@ namespace WechatBotFramework.Component
                 else if ((msg.FromUserName.ToString()).StartsWith("@@"))
                 {
                     msgTypeId = 3;
-                    user.senderName = GetPerferName(GetContactNames(user.senderId));                    
+                    user.senderName = GetPerferName(GetContactNames(user.senderId));
 
                     if (user.senderName == null)
                     {
@@ -1163,11 +1165,11 @@ namespace WechatBotFramework.Component
                                 break;
                         }
                     }
-                   /* else /// Added by Julia: when the contact is not stored locally, msgTypeId = 100
-                    {
-                        msgTypeId = 100;                        
-                    }
-                    */
+                    /* else /// Added by Julia: when the contact is not stored locally, msgTypeId = 100
+                     {
+                         msgTypeId = 100;                        
+                     }
+                     */
                 }
 
                 if (string.IsNullOrWhiteSpace(user.senderName))
@@ -1182,29 +1184,41 @@ namespace WechatBotFramework.Component
                 message.msg_type_id = msgTypeId;
                 message.msg_id = msg.MsgId.ToString();
                 message.to_user_id = msg.ToUserName.ToString();
-                
+
 
                 MessageContent content = this.ExtractContent(ref message, msgTypeId, msg);
                 message.content = content;
+
+                switch (message.content.type)
+                {
+                    case 3:
+                        message.content.data = wechatClient.GetNonTextMessage(message.content.data, "jpg");
+                        break;
+                    case 4:
+                        message.content.data = wechatClient.GetNonTextMessage(message.content.data, "mp3");
+                        break;
+                    default:
+                        break;
+                }
 
                 MessageHandler msgHandler = new MessageHandler();
                 ReplyInfo rinfo = msgHandler.HandleMessageAll(message);
 
                 if (!string.IsNullOrWhiteSpace(rinfo.reply))
-                { 
+                {
                     this.SendMessageByUID(rinfo.reply, msg.FromUserName.ToString());
                 }
 
             }
-            
+
         }
 
         private string GenerateMessageId()
         {
             string str = DateTime.Now.ToFileTime().ToString().Substring(0, 12);
             Random random = new Random();
-            for(int i = 0; i < 5; i ++)
-            { 
+            for (int i = 0; i < 5; i++)
+            {
                 str += random.Next(10).ToString();
             }
             return str;
@@ -1214,7 +1228,7 @@ namespace WechatBotFramework.Component
         {
             return word;
         }
-        
+
         class ResponseMessage
         {
             public int Type;
@@ -1233,7 +1247,7 @@ namespace WechatBotFramework.Component
 
         private bool SendMessageByUID(string word, string dst)
         {
-            
+
             if (string.IsNullOrWhiteSpace(dst))
             {
                 dst = "filehelper";
@@ -1265,7 +1279,7 @@ namespace WechatBotFramework.Component
             dynamic json = JsonConvert.DeserializeObject<dynamic>(result);
 
             int ret = json.BaseResponse.Ret;
-            
+
             if (ret == 0)
             {
                 log.Info("Sent response to msg sender successfully.");
@@ -1283,23 +1297,23 @@ namespace WechatBotFramework.Component
             if (unInfo == null)
             {
                 return null;
-            }    
-                               
+            }
+
             if (!string.IsNullOrWhiteSpace(unInfo.RemarkName))
             {
                 return unInfo.RemarkName;
             }
-           else if (!string.IsNullOrWhiteSpace(unInfo.NickName))
+            else if (!string.IsNullOrWhiteSpace(unInfo.NickName))
             {
                 return unInfo.NickName;
             }
-           else if (!string.IsNullOrWhiteSpace(unInfo.DisplayName))
+            else if (!string.IsNullOrWhiteSpace(unInfo.DisplayName))
             {
                 return unInfo.DisplayName;
             }
-            return null;               
-        }    
-        
+            return null;
+        }
+
         private UserNameInfo GetContactNames(string userId)
         {
             //if (!this.normalAccountInfo.Keys.Contains(userId))
@@ -1358,7 +1372,7 @@ namespace WechatBotFramework.Component
                 if (aGroupMembers[userId] != null)
                 {
                     ContactInfo member = aGroupMembers[userId];
-                    UserNameInfo unInfo = new UserNameInfo();                    
+                    UserNameInfo unInfo = new UserNameInfo();
 
                     if (!string.IsNullOrWhiteSpace(member.RemarkName))
                     {
@@ -1411,9 +1425,10 @@ namespace WechatBotFramework.Component
                             //log.Info("retcode is 1101.");
                             break;
                         case "0":
-                            log.Info("retcode is 0, selector is " + syncInfo.selector);                         
+                            log.Info("retcode is 0, selector is " + syncInfo.selector);
                             string r = null;
-                            switch (syncInfo.selector) { 
+                            switch (syncInfo.selector)
+                            {
                                 case "2":
                                 case "3":
                                 case "4":
@@ -1423,14 +1438,14 @@ namespace WechatBotFramework.Component
                                     {
                                         this.HandleMessage(r);
                                     }
-                                    break;                                                                  
+                                    break;
                                 case "6":
                                     r = this.Sync();
                                     if (r != null)
                                     {
                                         this.GetContacts();
                                     }
-                                    break;                                                                    
+                                    break;
                                 case "0":
                                     break;
                                 default:
@@ -1450,7 +1465,7 @@ namespace WechatBotFramework.Component
                     }
                     this.Schedule();
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     log.Error(e.Message);
                 }
@@ -1460,9 +1475,9 @@ namespace WechatBotFramework.Component
                 if (latency < 0.8)
                 {
                     log.Debug("Begin to sleep " + (1.0 - latency).ToString() + " seconds.");
-                    Thread.Sleep( (int) ((1.0 - latency) * 1000));
+                    Thread.Sleep((int)((1.0 - latency) * 1000));
                 }
-            }           
+            }
         }
 
         public void Run()
@@ -1530,7 +1545,7 @@ namespace WechatBotFramework.Component
         {
             WechatProxy proxy = new WechatProxy();
             proxy.Run();
-            
+
             log.Info("Finished!");
         }
     }

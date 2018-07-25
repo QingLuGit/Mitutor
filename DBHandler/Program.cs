@@ -18,7 +18,7 @@ namespace DBHandler
         {
             SQLServerAccessor accessor = new SQLServerAccessor();
 
-            string tsvfilepath = "D:\\hackson\\TABot\\TABot\\DBSourceData\\Calculator3.tsv";
+            string tsvfilepath = @"D:\repository\Mitutor\DBSourceData\ScoreScripts.tsv";
             string csvfilepath = "D:\\hackson\\TABot\\TABot\\DBSourceData\\PSAScheduleData2.csv";           
 
             //CSVParser parser = new CSVParser(csvfilepath);
@@ -28,7 +28,7 @@ namespace DBHandler
             string createtablestr = parser.GenerateSQLQueryForCreateTable(schema);
             Console.WriteLine(createtablestr);
 
-            accessor.ExecSQL(createtablestr);
+            //accessor.ExecSQL(createtablestr);
 
             List<string> insertList = parser.GenerateSQLQueryForInsertRow(schema);
             StringBuilder builder = new StringBuilder();

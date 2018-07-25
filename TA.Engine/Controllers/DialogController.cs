@@ -17,21 +17,21 @@ namespace TA.Engine.Controllers
 {
     public class DialogController
     {
-        private readonly HashSet<string> ValidPSAIntents = new HashSet<string> {"AskTest", "AskExam", "AskCourseSchedule", "AskDelivery", "AskTrainingSchedule", "AskHomework", "AskNotification", "AskStoryContribution", "AskStorySchedule", "Greeting", "Praise", "AskSwimmingClass", "None" };
+        private readonly HashSet<string> ValidPSAIntents = new HashSet<string> { "AskTest", "AskExam", "AskCourseSchedule", "AskDelivery", "AskTrainingSchedule", "AskHomework", "AskNotification", "AskStoryContribution", "AskStorySchedule", "Greeting", "Praise", "AskSwimmingClass", "None" };
         public readonly string ONEONEPREFIX = "SINGLE_CONTACT";
 
         private LuisClient luisClient = new LuisClient();
 
         private static RuleTextStore ruleStore = RuleTextStore.Instance;
         private IContextManager cManager = new MemContextManager();
-            //new DBContextManager();
+        //new DBContextManager();
 
         public LUInfo Understand(string utterance, bool isSingleContact)
         {
             LUInfo currentLUInfo = null;
 
             if (string.IsNullOrWhiteSpace(utterance))
-            {                
+            {
                 currentLUInfo = new LUInfo();
                 currentLUInfo.Intent = new Intent();
                 currentLUInfo.Intent.intent = "Greeting";
@@ -41,22 +41,38 @@ namespace TA.Engine.Controllers
             {
                 utterance = ruleStore.Preprocess(utterance);
 
-                string ruleBasedIntent = ruleStore.DetermineIntent(utterance);               
-                
-                if ((!isSingleContact) && (!string.IsNullOrWhiteSpace(ruleBasedIntent)) &&　ruleBasedIntent == "DoTest")
+                string ruleBasedIntent = ruleStore.DetermineIntent(utterance);
+
+                if ((!isSingleContact) && (!string.IsNullOrWhiteSpace(ruleBasedIntent)) && ruleBasedIntent == "DoTest")
                 {
                     ruleBasedIntent = null;
                 }
 
                 if (!string.IsNullOrWhiteSpace(ruleBasedIntent))
                 {
-                    if (ruleBasedIntent == "DoTest") 
+                    if (ruleBasedIntent == "DoTest")
                     {
-                        currentLUInfo = new TestLUInfo();                        
+                        currentLUInfo = new TestLUInfo();
+                    }
+                    else if (ruleBasedIntent == "DoMath")
+                    {
+                        var testLUInfo = new TestLUInfo();
+                        testLUInfo.Course = "数学";
+                        currentLUInfo = testLUInfo;
+                    }
+                    else if (ruleBasedIntent == "DoEng")
+                    {
+                        var testLUInfo = new TestLUInfo();
+                        testLUInfo.Course = "英语";
+                        currentLUInfo = testLUInfo;
                     }
                     else if (ruleBasedIntent == "DoDISC")
                     {
                         currentLUInfo = new ExamLUInfo();
+                    }
+                    else if (ruleBasedIntent == "Score")
+                    {
+                        currentLUInfo = new ScoreLUInfo();
                     }
                     else
                     {
@@ -66,11 +82,10 @@ namespace TA.Engine.Controllers
                     currentLUInfo.Intent.intent = ruleBasedIntent;
                     currentLUInfo.Intent.score = 1;
                     currentLUInfo.EntityList = new List<Entity>();
-
                 }
 
-                if (currentLUInfo == null)                
-                { 
+                if (currentLUInfo == null)
+                {
                     currentLUInfo = this.luisClient.Query(utterance);
                 }
 
@@ -80,7 +95,7 @@ namespace TA.Engine.Controllers
                     currentLUInfo.EntityList.AddRange(rulebasedEntities);
                 }
             }
-            
+
             return currentLUInfo;
         }
 
@@ -139,25 +154,42 @@ namespace TA.Engine.Controllers
         private TaskFlowContext updateTFContext(ref TaskFlowContext context, string utterance)
         {
             context.IsInTesting = true;
-            context.UserInput = utterance;            
+            context.UserInput = utterance;
 
             return context;
         }
 
         private ExamSuitContext updateESContext(ref ExamSuitContext context, string utterance)
-        {                             
+        {
             context.UserInput = utterance;
-                       
+
             return context;
+        }
+
+        private ScoreContext updateSCContext(ref ScoreContext context, string utterance)
+        {
+            context.UserInput = utterance;
+            return context;
+        }
+
+        private ScoreContext InitScoreContext(string userId, ScoreLUInfo currentLUInfo)
+        {
+            ScoreContext scContext = new ScoreContext(userId);
+
+            scContext.Intent = currentLUInfo.Intent.intent;
+            scContext.currentIndex = 0;
+
+            return scContext;
         }
 
         private TaskFlowContext InitTFContext(string userId, TestLUInfo currentLUInfo)
         {
             TaskFlowContext tfContext = new TaskFlowContext(userId);
-                   
-            tfContext.Intent = currentLUInfo.Intent.intent; 
+
+            tfContext.Intent = currentLUInfo.Intent.intent;
             tfContext.CourseName = DatetimeUtils.GetCourseName(currentLUInfo);
             tfContext.currentIndex = 0;
+            tfContext.CourseInTest = currentLUInfo.Course;
 
             return tfContext;
         }
@@ -168,11 +200,12 @@ namespace TA.Engine.Controllers
             esContext.Intent = currentLUInfo.Intent.intent;
             esContext.currentIndex = 0;
 
-            return esContext;                                 
+            return esContext;
         }
 
         private bool IsValid(PSAContext context)
         {
+            return false;
 
             DateTime nowTime = DateTime.Now;
 
@@ -231,7 +264,7 @@ namespace TA.Engine.Controllers
             else
             {
                 if (ci.type == ContextType.PSAContext)
-                { 
+                {
                     PSAContext psaContext = JsonConvert.DeserializeObject<PSAContext>(ci.jsonString);
 
                     if (IsValid(psaContext))
@@ -242,18 +275,22 @@ namespace TA.Engine.Controllers
                     {
                         return null;
                     }
-                    
                 }
                 else if (ci.type == ContextType.ExamSuitContext)
                 {
                     ExamSuitContext esContext = JsonConvert.DeserializeObject<ExamSuitContext>(ci.jsonString);
                     return esContext;
                 }
+                else if (ci.type == ContextType.ScoreContext)
+                {
+                    ScoreContext scContext = JsonConvert.DeserializeObject<ScoreContext>(ci.jsonString);
+                    return scContext;
+                }
                 else
                 {
                     TaskFlowContext tfContext = JsonConvert.DeserializeObject<TaskFlowContext>(ci.jsonString);
                     return tfContext;
-                }                
+                }
             }
         }
 
@@ -276,13 +313,13 @@ namespace TA.Engine.Controllers
         }
 
         public string Answer(string userId, string utterance)
-        {            
+        {
             BotContext context = this.GetValidContext(userId);
 
             bool isSingleContact = this.IsSingleContact(ref utterance);
 
             if (context == null)
-            {                
+            {
                 LUInfo luInfo = Understand(utterance, isSingleContact);
                 if (luInfo.GetType() == typeof(TestLUInfo))
                 {
@@ -292,6 +329,10 @@ namespace TA.Engine.Controllers
                 {
                     context = InitESContext(userId, (ExamLUInfo)luInfo);
                 }
+                else if (luInfo.GetType() == typeof(ScoreLUInfo))
+                {
+                    context = InitScoreContext(userId, (ScoreLUInfo)luInfo);
+                }
                 else
                 {
                     context = initPSAContext(userId, luInfo);
@@ -300,36 +341,56 @@ namespace TA.Engine.Controllers
                 cManager.CreateContext(context, userId);
             }
             else
-            {                
+            {
                 if (context.type == ContextType.TaskFlowContext && isSingleContact)
                 {
                     TaskFlowContext tfContext = (TaskFlowContext)context;
-                    context = updateTFContext(ref tfContext, utterance);                    
+                    context = updateTFContext(ref tfContext, utterance);
                 }
                 else if (context.type == ContextType.ExamSuitContext && isSingleContact)
-                {                     
+                {
                     ExamSuitContext esContext = (ExamSuitContext)context;
-                    context = updateESContext(ref esContext, utterance);                    
+                    context = updateESContext(ref esContext, utterance);
+                }
+                else if (context.type == ContextType.ScoreContext && isSingleContact)
+                {
+                    ScoreContext scContext = (ScoreContext)context;
+                    context = updateSCContext(ref scContext, utterance);
                 }
                 else
                 {
                     LUInfo luInfo = Understand(utterance, isSingleContact);
 
                     if (context.type == ContextType.PSAContext)
-                    {                        
+                    {
                         PSAContext psacontext = (PSAContext)context;
                         context = updatePSAContext(ref psacontext, luInfo);
                     }
                     else
-                    {                        
+                    {
                         return "[Error]: Unknown Context Type.";
                     }
-                }                
+                }
             }
 
             string answer = null;
-            switch(context.type)
+            switch (context.type)
             {
+                case ContextType.ScoreContext:
+                    ScoreEngine engineS = new ScoreEngine();
+                    ScoreContext scContext = (ScoreContext)context;
+
+                    answer = engineS.Answer(userId, ref scContext);
+
+                    if (scContext.IsInTesting)
+                    {
+                        cManager.UpdateContext(scContext, userId);
+                    }
+                    else
+                    {
+                        cManager.RemoveContext(userId);
+                    }
+                    break;
                 case ContextType.PSAContext:
                     ChatTableEngine engine = new ChatTableEngine();
                     PSAContext psacontext = (PSAContext)context;
@@ -345,7 +406,7 @@ namespace TA.Engine.Controllers
                     answer = engineT.Answer(userId, ref tfContext);
 
                     if (tfContext.IsInTesting)
-                    { 
+                    {
                         cManager.UpdateContext(tfContext, userId);
                     }
                     else
@@ -354,13 +415,13 @@ namespace TA.Engine.Controllers
                     }
                     break;
                 case ContextType.ExamSuitContext:
-                    
+
                     ExamSuitContext esContext = (ExamSuitContext)context;
                     DICSExamSrv taskSrv = new DICSExamSrv();
-                    
+
                     string userInput = esContext.UserInput;
 
-                    switch(esContext.status)
+                    switch (esContext.status)
                     {
                         case ESStatus.Started:
                             ExamSuitContext cachedContext = this.GetCachedESContext(userId);
@@ -374,7 +435,7 @@ namespace TA.Engine.Controllers
                         case ESStatus.OnGoing:
                             answer = taskSrv.ReceiveUserAnswer(ref esContext, userInput);
                             break;
-                            
+
                     }
 
                     if (esContext.status == ESStatus.Finished || esContext.status == ESStatus.Aborded)
@@ -390,10 +451,10 @@ namespace TA.Engine.Controllers
                     {
                         cManager.UpdateContext(esContext, userId);
                     }
-                  
+
                     break;
             }
-               
+
             return answer;
         }
 

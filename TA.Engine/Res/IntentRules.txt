@@ -1,5 +1,13 @@
 ﻿^我要做题$	DoTest
 ^(我要做)(数学|算数|算术|外语|英语)(题)$	DoTest
+^算术$	DoMath
+^英语单词$	DoEng
 ^性格测试$	DoDISC
+^英语跟读$	Score
+^语音测试$	Score
 ^disc$	DoDISC
 ^dics$	DoDISC
+^A$	DoMath
+^B$	DoEng
+^C$	Score
+^D$	DoDISC

@@ -22,6 +22,8 @@ namespace TA.Engine.Engines
             switch (tfContext.Intent)
             {
                 case "DoTest":
+                case "DoMath":
+                case "DoEng":
                        
                     if (!tfContext.IsInTesting)
                     {
@@ -39,7 +41,7 @@ namespace TA.Engine.Engines
                         }
                     }
 
-                    break;                
+                    break;
             }            
 
             return answer;

@@ -11,11 +11,18 @@ namespace TA.Engine.Data
     {
         public bool IsStartStep;
         public string UserInput;
+        public string Course;
     }
 
     public class ExamLUInfo: LUInfo
     {
         //public bool IsStartStep;        
         public string UserInput;        
+    }
+
+    public class ScoreLUInfo : LUInfo
+    {
+        public bool IsStartStep;
+        public string UserInput;
     }
 }

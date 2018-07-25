@@ -72,6 +72,40 @@ namespace WechatBotFramework.Component
 
         }
 
+        public string GetNonTextMessage(string url, string type = "jpg")
+        {
+            try
+            {
+                HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+                req.CookieContainer = cookieContainer; // <= HERE
+                req.Method = "GET";
+                req.KeepAlive = false;
+
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+
+                string timeStamp = DateTime.Now.ToString("yyyyMMddhhmmssff");
+                string path = string.Format(@"d:\{0}.{1}", timeStamp, type);
+                using (Stream responseStream = resp.GetResponseStream())
+                {
+                    using (Stream stream = new FileStream(path, FileMode.CreateNew))
+                    {
+                        byte[] bArr = new byte[1024];
+                        int size;
+                        while ((size = responseStream.Read(bArr, 0, bArr.Length)) > 0)
+                        {
+                            stream.Write(bArr, 0, size);
+                        }
+                    }
+                }
+                return path;
+            }
+            catch (WebException e)
+            {
+                log.Error(e.Message);
+                return null;
+            }
+        }
+
         public string Post(string url, string paramJsonStr, int timeoutSeconds)
         {
             DateTime startTime = DateTime.Now;
